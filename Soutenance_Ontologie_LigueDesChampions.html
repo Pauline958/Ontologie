@@ -1,0 +1,813 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Soutenance — Ontologie Ligue des Champions</title>
+<meta name="viewport" content="width=1280">
+<style>
+  /* ---------- Palette UCL ---------- */
+  :root{
+    --navy:#0A1F3F;
+    --navy-deep:#061633;
+    --navy-soft:#1B3266;
+    --gold:#D4A93C;
+    --gold-soft:#F2D779;
+    --silver:#C8D0DA;
+    --cream:#F6F3EA;
+    --text:#0E1A2C;
+    --muted:#5A6273;
+    --white:#ffffff;
+    --slide-w:1280px;
+    --slide-h:720px;
+  }
+
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;background:#1a1a1a;font-family:Calibri,"Segoe UI","Helvetica Neue",Arial,sans-serif;color:var(--text)}
+
+  /* ---------- Stage ---------- */
+  .stage{
+    position:relative;
+    width:100vw;height:100vh;
+    display:flex;align-items:center;justify-content:center;
+    overflow:hidden;
+  }
+  .deck{
+    position:relative;
+    width:var(--slide-w);
+    height:var(--slide-h);
+    transform-origin:center center;
+    background:transparent;
+  }
+  .slide{
+    position:absolute;inset:0;
+    background:#fff;
+    overflow:hidden;
+    display:none;
+    box-shadow:0 30px 80px rgba(0,0,0,.5);
+  }
+  .slide.active{display:block}
+
+  /* ---------- Topbar (logo + sommaire) ---------- */
+  .topbar{
+    position:absolute;left:0;top:0;right:0;height:54px;
+    background:var(--navy);
+    display:flex;align-items:center;gap:18px;
+    padding:0 24px;z-index:10;
+  }
+  .topbar .logo{height:34px;width:auto;flex-shrink:0}
+  .topbar .logo-box{background:#fff;padding:4px 8px;border-radius:4px;flex-shrink:0;display:flex;align-items:center}
+  .topbar .toc{display:flex;align-items:center;gap:4px;margin-left:auto;font-size:11px}
+  .topbar .toc a{
+    color:var(--silver);text-decoration:none;
+    padding:5px 10px;border-radius:999px;
+    white-space:nowrap;transition:background .15s,color .15s;
+  }
+  .topbar .toc a:hover{background:rgba(255,255,255,.08);color:#fff}
+  .topbar .toc a.cur{background:var(--gold);color:var(--navy);font-weight:700}
+  .topbar .toc .sep{color:rgba(200,208,218,.35);padding:0 2px}
+
+  /* ---------- Layout primitives ---------- */
+  .band-foot{
+    position:absolute;left:0;bottom:0;width:100%;height:34px;
+    background:var(--navy);color:var(--silver);
+    font-size:11px;display:flex;align-items:center;justify-content:space-between;
+    padding:0 28px;
+  }
+  .band-foot .pg{color:var(--gold-soft);font-weight:700}
+  .eyebrow{
+    position:absolute;left:54px;top:74px;
+    font-size:12px;font-weight:700;letter-spacing:.32em;color:var(--gold);
+    text-transform:uppercase;
+  }
+  .h1{
+    position:absolute;left:54px;top:106px;right:54px;
+    font-family:Georgia,"Cambria",serif;font-weight:700;color:var(--navy);
+    font-size:38px;line-height:1.1;margin:0;
+  }
+
+  /* ---------- Slide 1 (titre) ---------- */
+  .title-slide{background:var(--navy-deep)}
+  .title-slide .halo-1{
+    position:absolute;left:-260px;top:-260px;width:660px;height:660px;border-radius:50%;
+    background:radial-gradient(circle,rgba(212,169,60,.18),rgba(212,169,60,0) 65%);
+    pointer-events:none;
+  }
+  .title-slide .halo-2{
+    position:absolute;right:-220px;bottom:-220px;width:780px;height:780px;border-radius:50%;
+    background:rgba(27,50,102,.55);
+    pointer-events:none;
+  }
+  .title-slide .title-content{position:absolute;inset:0;padding:88px 96px;display:flex;flex-direction:column;justify-content:flex-start;color:#fff}
+  .title-slide .kicker{font-size:13px;letter-spacing:.45em;color:var(--gold);font-weight:700;text-transform:uppercase}
+  .title-slide h1{font-family:Georgia,serif;font-weight:700;font-size:78px;line-height:1.05;margin:24px 0 0;color:#fff}
+  .title-slide h1 .sub{display:block;font-size:60px}
+  .title-slide .lead{margin-top:24px;font-size:20px;font-style:italic;color:var(--silver);max-width:800px}
+  .title-slide .rule{margin-top:64px;width:140px;height:5px;background:var(--gold)}
+  .title-slide .author{margin-top:22px;font-weight:700;color:#fff;font-size:20px}
+  .title-slide .author small{display:block;font-weight:400;color:var(--silver);font-size:15px;margin-top:4px}
+
+  /* ---------- Slide 2 (plan) ---------- */
+  .plan-grid{position:absolute;left:54px;right:54px;top:200px;display:grid;grid-template-columns:1fr 1fr;gap:24px 36px}
+  .plan-item{display:flex;align-items:center;gap:22px}
+  .plan-num{
+    width:62px;height:62px;border-radius:50%;background:var(--navy);color:var(--gold);
+    display:flex;align-items:center;justify-content:center;
+    font-family:Georgia,serif;font-size:24px;font-weight:700;flex-shrink:0;
+  }
+  .plan-text{font-size:18px;color:var(--text)}
+
+  /* ---------- Cards (réutilisables) ---------- */
+  .card{
+    background:#fff;border:1px solid var(--silver);border-radius:10px;
+    padding:18px 22px;position:relative;
+  }
+  .card.cream{background:var(--cream);border-color:#e7e2cf}
+  .card .accent{
+    position:absolute;left:0;top:0;bottom:0;width:7px;background:var(--gold);
+    border-top-left-radius:10px;border-bottom-left-radius:10px;
+  }
+  .card .name{font-family:Georgia,serif;font-size:18px;font-weight:700;color:var(--navy)}
+  .card .ld{font-family:"Cambria Math",Cambria,Georgia,serif;font-size:15px;margin-top:8px}
+  .card .ld b{color:var(--navy)}
+  .card .pro{font-family:Consolas,"Courier New",monospace;font-size:12px;color:var(--text);margin-top:8px}
+  .card .pro b{color:var(--navy);font-family:Calibri,Arial,sans-serif}
+  .card .note{margin-top:8px;font-size:12px;color:var(--muted);font-style:italic}
+
+  /* ---------- Slide 3 (domaine) ---------- */
+  .two-col{position:absolute;left:54px;right:54px;top:200px;bottom:50px;display:grid;grid-template-columns:1fr 1.1fr;gap:36px}
+  .perimeter{background:var(--cream);border:1px solid #e7e2cf;border-radius:12px;padding:28px}
+  .perimeter .lab{font-size:11px;letter-spacing:.32em;color:var(--gold);font-weight:700;text-transform:uppercase}
+  .perimeter h2{font-family:Georgia,serif;font-size:22px;color:var(--navy);margin:8px 0 18px}
+  .perimeter ul{margin:0;padding-left:20px;font-size:15px;line-height:1.65}
+  .perimeter ul li{margin-bottom:6px}
+
+  .questions .lab{font-size:11px;letter-spacing:.32em;color:var(--gold);font-weight:700;text-transform:uppercase}
+  .questions h2{font-family:Georgia,serif;font-size:22px;color:var(--navy);margin:8px 0 16px}
+  .qlist{margin:0;padding:0;list-style:none}
+  .qlist li{display:flex;gap:12px;padding:6px 0;font-size:15px;line-height:1.5}
+  .qlist li .qn{font-family:Georgia,serif;color:var(--gold);font-weight:700;min-width:22px}
+
+  /* ---------- Slide 4 (vue globale) ---------- */
+  .stat-row{position:absolute;left:54px;right:54px;top:198px;display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+  .stat{
+    background:#fff;border:1px solid var(--silver);border-radius:10px;
+    padding:18px 22px;display:flex;align-items:center;gap:18px;
+    position:relative;
+  }
+  .stat::before{content:"";position:absolute;left:0;top:0;bottom:0;width:7px;background:var(--navy);border-top-left-radius:10px;border-bottom-left-radius:10px}
+  .stat.gold::before{background:var(--gold)}
+  .stat.soft::before{background:var(--navy-soft)}
+  .stat .num{font-family:Georgia,serif;font-size:54px;font-weight:700;color:var(--navy);line-height:1}
+  .stat.gold .num{color:var(--gold)}
+  .stat.soft .num{color:var(--navy-soft)}
+  .stat .lbl{font-size:14px;color:var(--text)}
+
+  .families{position:absolute;left:54px;right:54px;top:380px;display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+  .families .h{font-size:11px;letter-spacing:.32em;color:var(--gold);font-weight:700;text-transform:uppercase;grid-column:1/-1;margin-top:-26px}
+  .fam{background:var(--cream);border:1px solid #e7e2cf;border-radius:10px;padding:14px 16px;min-height:130px}
+  .fam .dot{width:11px;height:11px;border-radius:50%;background:var(--navy);display:inline-block;margin-right:8px;vertical-align:middle}
+  .fam.gold .dot{background:var(--gold)}
+  .fam.soft .dot{background:var(--navy-soft)}
+  .fam .ttl{font-weight:700;color:var(--navy);font-size:14px;display:inline-block;vertical-align:middle}
+  .fam .it{margin-top:8px;font-size:12.5px;color:var(--text);line-height:1.45}
+
+  /* ---------- Slide 5 (relations) ---------- */
+  .char-row{position:absolute;left:54px;right:54px;top:200px;display:grid;grid-template-columns:repeat(6,1fr);gap:14px}
+  .char{
+    background:var(--navy);border-radius:8px;padding:14px 8px;text-align:center;color:#fff;
+  }
+  .char .v{font-family:Georgia,serif;font-size:30px;color:var(--gold);font-weight:700;line-height:1}
+  .char .l{margin-top:6px;font-size:11.5px;color:var(--silver)}
+
+  .rel-table{position:absolute;left:54px;right:54px;top:340px;}
+  .rel-table .h{font-size:11px;letter-spacing:.32em;color:var(--gold);font-weight:700;text-transform:uppercase;margin-bottom:10px}
+  table.rt{width:100%;border-collapse:collapse;font-size:13px}
+  table.rt th{background:var(--navy);color:#fff;font-weight:700;text-align:left;padding:10px 12px;font-size:13px}
+  table.rt td{padding:9px 12px;border-bottom:1px solid var(--silver)}
+  table.rt tr:nth-child(even) td{background:var(--cream)}
+  table.rt code{font-family:Consolas,"Courier New",monospace;font-size:12.5px}
+
+  /* ---------- Slide 6 / 7 (concepts définis) ---------- */
+  .grid-2{position:absolute;left:54px;right:54px;top:198px;bottom:50px;display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  .grid-3{position:absolute;left:54px;right:54px;top:198px;bottom:50px;display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+
+  .qcard{background:var(--navy);color:#fff;border-radius:10px;padding:18px 20px;position:relative;display:flex;flex-direction:column}
+  .qcard .name{font-family:Georgia,serif;font-size:16px;color:#fff;font-weight:700}
+  .qcard .ld{font-family:"Cambria Math",Cambria,Georgia,serif;font-size:14px;margin-top:10px;color:#fff}
+  .qcard .ld b{color:var(--gold)}
+  .qcard .pro{font-family:Consolas,"Courier New",monospace;font-size:11.5px;color:var(--silver);margin-top:8px}
+  .qcard .pro b{color:var(--gold);font-family:Calibri,Arial,sans-serif}
+  .pill{
+    position:absolute;right:18px;top:18px;
+    background:var(--gold);color:var(--navy);font-family:Georgia,serif;font-weight:700;
+    font-size:13px;padding:5px 14px;border-radius:999px;
+  }
+
+  /* ---------- Slide 8 (inférences) ---------- */
+  .inf-list{position:absolute;left:54px;right:54px;top:206px;bottom:50px;display:flex;flex-direction:column;gap:14px}
+  .inf{
+    background:var(--cream);border:1px solid #e7e2cf;border-radius:10px;
+    padding:14px 22px;
+  }
+  .inf .ttl{font-family:Georgia,serif;font-size:16px;color:var(--navy);font-weight:700;margin-bottom:6px}
+  .inf .body{display:grid;grid-template-columns:1fr 60px 1fr;gap:14px;align-items:start}
+  .inf pre{margin:0;font-family:Consolas,"Courier New",monospace;font-size:12.5px;color:var(--text);white-space:pre-wrap}
+  .inf .arrow{font-family:Georgia,serif;font-size:30px;color:var(--gold);font-weight:700;text-align:center;align-self:center}
+  .inf .out{color:var(--navy);font-weight:700}
+
+  /* ---------- Slide 9 (instances) ---------- */
+  .ind-list{position:absolute;left:54px;top:200px;width:560px;}
+  .ind-list .h{font-size:11px;letter-spacing:.32em;color:var(--gold);font-weight:700;text-transform:uppercase;margin-bottom:14px}
+  .ind-row{display:flex;align-items:flex-start;gap:14px;padding:7px 0;font-size:14px}
+  .ind-row .b{width:9px;height:9px;border-radius:50%;background:var(--gold);margin-top:7px;flex-shrink:0}
+  .ind-row b{color:var(--navy)}
+
+  .test{position:absolute;right:54px;top:200px;width:560px;background:var(--navy);border-radius:10px;padding:24px;color:#fff}
+  .test .h{font-size:11px;letter-spacing:.32em;color:var(--gold);font-weight:700;text-transform:uppercase}
+  .test h2{font-family:Georgia,serif;font-size:22px;margin:8px 0 18px;color:#fff}
+  .test .sub{font-size:11px;font-weight:700;color:var(--gold-soft);text-transform:uppercase;letter-spacing:.18em;margin-top:14px}
+  .test code.box{display:block;background:var(--navy-deep);border-radius:6px;padding:10px 14px;font-family:Consolas,"Courier New",monospace;font-size:14px;font-weight:700;color:#fff;margin-top:6px}
+  .test p{margin:6px 0 0;color:var(--silver);font-size:13px;line-height:1.5}
+  .test p b{color:var(--gold)}
+
+  /* ---------- Slide 10 (sparql) ---------- */
+  .sparql-q{position:absolute;left:54px;right:54px;top:200px;font-family:Georgia,serif;font-style:italic;font-size:18px;color:var(--navy);font-weight:700}
+  .sparql-row{position:absolute;left:54px;right:54px;top:260px;bottom:90px;display:grid;grid-template-columns:1.5fr 1fr;gap:20px}
+  .codebox{background:var(--navy-deep);color:var(--silver);border-radius:10px;padding:20px;font-family:Consolas,"Courier New",monospace;font-size:13.5px;line-height:1.45;white-space:pre;overflow:hidden}
+  .codebox .lab{font-size:10px;letter-spacing:.32em;color:var(--gold);font-weight:700;font-family:Calibri,Arial,sans-serif;display:block;margin-bottom:10px;text-transform:uppercase}
+  .resbox{background:var(--cream);border:1px solid #e7e2cf;border-radius:10px;padding:20px}
+  .resbox .lab{font-size:10px;letter-spacing:.32em;color:var(--gold);font-weight:700;text-transform:uppercase;display:block;margin-bottom:8px}
+  .resbox table{width:100%;border-collapse:collapse;font-size:12px;margin-bottom:14px}
+  .resbox th{background:var(--navy);color:#fff;text-align:left;padding:6px 10px}
+  .resbox td{padding:8px 10px;border-bottom:1px solid var(--silver);text-align:center;color:var(--text)}
+  .resbox p{margin:0;font-size:12px;line-height:1.5}
+  .sparql-foot{position:absolute;left:54px;right:54px;bottom:50px;text-align:center;color:var(--muted);font-style:italic;font-size:12.5px}
+
+  /* ---------- Slide 11 (difficultés) ---------- */
+  .diff-grid{position:absolute;left:54px;right:54px;top:200px;bottom:50px;display:grid;grid-template-columns:1fr 1fr;grid-template-rows:auto auto auto;gap:16px}
+  .diff{background:#fff;border:1px solid var(--silver);border-radius:10px;padding:14px 18px 14px 22px;position:relative}
+  .diff::before{content:"";position:absolute;left:0;top:10px;bottom:10px;width:5px;background:var(--gold);border-radius:3px}
+  .diff h3{font-family:Georgia,serif;font-size:15px;color:var(--navy);margin:0 0 6px}
+  .diff p{margin:0;font-size:12.5px;line-height:1.5;color:var(--text)}
+  .diff.center{grid-column:1/-1;max-width:600px;justify-self:center}
+
+  /* ---------- Slide 12 (conclusion) ---------- */
+  .closing{background:var(--navy-deep);color:#fff}
+  .closing .halo{
+    position:absolute;right:-160px;top:-160px;width:760px;height:760px;border-radius:50%;
+    border:1.5px solid rgba(212,169,60,.45);background:radial-gradient(circle,rgba(212,169,60,.08),rgba(212,169,60,0) 70%);
+  }
+  .closing .body{position:absolute;inset:0;padding:90px 80px 0}
+  .closing .lab{font-size:13px;letter-spacing:.45em;color:var(--gold);font-weight:700;text-transform:uppercase}
+  .closing h1{font-family:Georgia,serif;font-size:42px;line-height:1.1;margin:14px 0 28px;color:#fff}
+  .closing ul{padding-left:0;list-style:none;margin:0}
+  .closing ul li{padding:8px 0 8px 28px;color:var(--silver);font-size:18px;position:relative}
+  .closing ul li::before{content:"";position:absolute;left:0;top:18px;width:10px;height:10px;border-radius:50%;background:var(--gold)}
+  .closing .qa{
+    position:absolute;left:80px;right:80px;bottom:80px;
+    background:var(--gold);color:var(--navy-deep);
+    border-radius:12px;padding:32px;text-align:center;
+    font-family:Georgia,serif;font-weight:700;font-size:28px;
+  }
+  .closing .meta{position:absolute;left:0;right:0;bottom:18px;text-align:center;color:var(--silver);font-size:11.5px}
+
+  /* ---------- Navigation ---------- */
+  .nav{
+    position:fixed;
+    padding:0 18px;display:flex;align-items:center;gap:12px;
+    color:#fff;font-size:13px;z-index:50;
+  }
+  .nav button{
+    background:transparent;border:0;color:var(--gold-soft);cursor:pointer;font-size:12px;
+    padding:4px 10px;border-radius:6px;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .nav button:hover{background:rgba(212,169,60,.15)}
+  .nav .counter{min-width:54px;text-align:center;font-variant-numeric:tabular-nums}
+  .nav .sep{width:1px;height:18px;background:rgba(212,169,60,.3)}
+  .nav button.fs svg{width:14px;height:14px;display:block}
+
+  .help{
+    position:fixed;top:14px;right:18px;color:rgba(255,255,255,.55);font-size:11.5px;z-index:40;
+  }
+
+  /* ---------- Print / export ---------- */
+  @media print{
+    @page{size:1280px 720px;margin:0}
+    html,body{background:#fff}
+    .stage{display:block;width:auto;height:auto}
+    .deck{transform:none !important;width:1280px;height:720px;page-break-after:always}
+    .slide{display:block !important;position:relative;page-break-inside:avoid;box-shadow:none}
+    .slide:not(.printable){display:none !important}
+    .nav,.help{display:none}
+  }
+</style>
+</head>
+<body>
+
+<div class="stage">
+  <div class="deck" id="deck">
+
+    <!-- ============ Slide 1 — Titre ============ -->
+    <section class="slide active title-slide" data-page="1">
+      <div class="halo-1"></div>
+      <div class="halo-2"></div>
+      <div class="title-content">
+        <div class="kicker">UE • Connaissance et Représentation • Web sémantique</div>
+        <h1>Ontologie de la <span class="sub">Ligue des Champions</span></h1>
+        <div class="lead">Modélisation, raisonnement et requêtes SPARQL sur le football européen.</div>
+        <div class="rule"></div>
+        <div class="author">Emma Kerguillec
+          <small>Soutenance — 20 mai 2026</small>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ Slide 2 — Plan ============ -->
+    <section class="slide" data-page="2">
+      <div class="eyebrow">Déroulé — 10 min</div>
+      <h1 class="h1">Plan de la présentation</h1>
+      <div class="plan-grid">
+        <div class="plan-item"><div class="plan-num">1</div><div class="plan-text">Domaine et questions de compétence</div></div>
+        <div class="plan-item"><div class="plan-num">2</div><div class="plan-text">Vue globale&nbsp;: hiérarchie de concepts</div></div>
+        <div class="plan-item"><div class="plan-num">3</div><div class="plan-text">Relations et caractéristiques</div></div>
+        <div class="plan-item"><div class="plan-num">4</div><div class="plan-text">Concepts définis en logique de description</div></div>
+        <div class="plan-item"><div class="plan-num">5</div><div class="plan-text">Inférences automatiques du raisonneur</div></div>
+        <div class="plan-item"><div class="plan-num">6</div><div class="plan-text">Instances et test de cohérence</div></div>
+        <div class="plan-item"><div class="plan-num">7</div><div class="plan-text">Requêtes SPARQL</div></div>
+        <div class="plan-item"><div class="plan-num">8</div><div class="plan-text">Difficultés et conclusion</div></div>
+      </div>
+      <div class="band-foot"><span>Soutenance projet ontologie • UE Connaissance et Représentation</span><span class="pg">2 / 12</span></div>
+    </section>
+
+    <!-- ============ Slide 3 — Domaine ============ -->
+    <section class="slide" data-page="3">
+      <div class="eyebrow">Étape 1</div>
+      <h1 class="h1">Domaine et questions de compétence</h1>
+
+      <div class="two-col">
+        <div class="perimeter">
+          <div class="lab">Périmètre</div>
+          <h2>La Ligue des Champions de l'UEFA</h2>
+          <ul>
+            <li>Acteurs&nbsp;: joueurs, entraîneurs, arbitres.</li>
+            <li>Structures&nbsp;: clubs, confédérations, pays, villes, stades.</li>
+            <li>Compétition&nbsp;: matches, tours, finales, saisons, trophées.</li>
+            <li>Événements de jeu&nbsp;: buts, cartons (jaunes / rouges).</li>
+          </ul>
+        </div>
+        <div class="questions">
+          <div class="lab">Questions auxquelles l'ontologie répond</div>
+          <h2>8 questions de compétence</h2>
+          <ol class="qlist">
+            <li><span class="qn">1.</span> Quels joueurs évoluent dans un club français&nbsp;?</li>
+            <li><span class="qn">2.</span> Quels clubs ont remporté ≥ 3 fois la Ligue des Champions&nbsp;?</li>
+            <li><span class="qn">3.</span> Quels matches se sont joués au Santiago-Bernabéu&nbsp;?</li>
+            <li><span class="qn">4.</span> Quels joueurs ont marqué plus de 10 buts&nbsp;?</li>
+            <li><span class="qn">5.</span> Quels arbitres ont officié sur une finale&nbsp;?</li>
+            <li><span class="qn">6.</span> Quels clubs européens n'ont aucun gardien recensé&nbsp;?</li>
+            <li><span class="qn">7.</span> Quels joueurs ont reçu un carton rouge en finale&nbsp;?</li>
+            <li><span class="qn">8.</span> Quels stades sont localisés en Espagne&nbsp;?</li>
+          </ol>
+        </div>
+      </div>
+      <div class="band-foot"><span>Soutenance projet ontologie • UE Connaissance et Représentation</span><span class="pg">Emma KERGUILLEC • Prenom Nom</span></div>
+    </section>
+
+    <!-- ============ Slide 4 — Vue globale ============ -->
+    <section class="slide" data-page="4">
+      <div class="eyebrow">Étape 2</div>
+      <h1 class="h1">Vue globale&nbsp;: hiérarchie de concepts</h1>
+
+      <div class="stat-row">
+        <div class="stat"><div class="num">27</div><div class="lbl">concepts primitifs</div></div>
+        <div class="stat gold"><div class="num">23</div><div class="lbl">concepts définis</div></div>
+        <div class="stat soft"><div class="num">4</div><div class="lbl">niveaux de profondeur</div></div>
+      </div>
+
+      <div class="families">
+        <div class="h">Concepts primitifs — 6 familles</div>
+        <div class="fam"><span class="dot"></span><span class="ttl">Acteurs</span><div class="it">Personne, Joueur, Entraineur, Arbitre</div></div>
+        <div class="fam soft"><span class="dot"></span><span class="ttl">Postes</span><div class="it">Position, Gardien, Defenseur, Milieu, Attaquant</div></div>
+        <div class="fam gold"><span class="dot"></span><span class="ttl">Structures</span><div class="it">Equipe, Club, Confederation</div></div>
+        <div class="fam"><span class="dot"></span><span class="ttl">Géographie</span><div class="it">Pays, Ville, Stade</div></div>
+        <div class="fam soft"><span class="dot"></span><span class="ttl">Compétitions</span><div class="it">Match, MatchPhaseDeGroupes, MatchPhaseEliminatoire, HuitiemeDeFinale, QuartDeFinale, DemiFinale, Finale, Saison, Trophee</div></div>
+        <div class="fam gold"><span class="dot"></span><span class="ttl">Événements</span><div class="it">But, Carton, CartonJaune, CartonRouge</div></div>
+      </div>
+      <div class="band-foot"><span>Soutenance projet ontologie • UE Connaissance et Représentation</span><span class="pg">4 / 12</span></div>
+    </section>
+
+    <!-- ============ Slide 5 — Relations ============ -->
+    <section class="slide" data-page="5">
+      <div class="eyebrow">Étape 3</div>
+      <h1 class="h1">Object properties et caractéristiques</h1>
+
+      <div class="char-row">
+        <div class="char"><div class="v">9</div><div class="l">fonctionnelles</div></div>
+        <div class="char"><div class="v">4</div><div class="l">inv. fonctionnelles</div></div>
+        <div class="char"><div class="v">2</div><div class="l">transitives</div></div>
+        <div class="char"><div class="v">2</div><div class="l">symétriques</div></div>
+        <div class="char"><div class="v">1</div><div class="l">irréflexive</div></div>
+        <div class="char"><div class="v">5</div><div class="l">couples inverse</div></div>
+      </div>
+
+      <div class="rel-table">
+        <div class="h">Quelques relations clés</div>
+        <table class="rt">
+          <thead><tr><th style="width:21%">Relation</th><th style="width:13%">Domaine</th><th style="width:13%">Co-domaine</th><th>Caractéristique(s)</th></tr></thead>
+          <tbody>
+            <tr><td><code>joueDans</code></td><td>Joueur</td><td>Club</td><td>Fonctionnelle &nbsp;(inverse de aPourMembre)</td></tr>
+            <tr><td><code>estDans</code></td><td>⊤</td><td>⊤</td><td>Transitive&nbsp; (super-relation : Stade → Ville → Pays)</td></tr>
+            <tr><td><code>joueContre</code></td><td>Equipe</td><td>Equipe</td><td>Symétrique, irréflexive</td></tr>
+            <tr><td><code>estCoequipierDe</code></td><td>Joueur</td><td>Joueur</td><td>Symétrique, transitive</td></tr>
+            <tr><td><code>aPourArbitre</code></td><td>Match</td><td>Arbitre</td><td>Fonctionnelle</td></tr>
+            <tr><td><code>aMarque</code></td><td>Joueur</td><td>But</td><td>Inv. fonctionnelle (un but ↔ un seul buteur)</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="band-foot"><span>Soutenance projet ontologie • UE Connaissance et Représentation</span><span class="pg">5 / 12</span></div>
+    </section>
+
+    <!-- ============ Slide 6 — Quantificateurs ∃ et ∀ ============ -->
+    <section class="slide" data-page="6">
+      <div class="eyebrow">Étape 4 — 1/2</div>
+      <h1 class="h1">Concepts définis&nbsp;: quantificateurs ∃ et ∀</h1>
+
+      <div class="grid-2">
+        <div class="card"><div class="accent"></div>
+          <div class="name">GardienDeBut</div>
+          <div class="ld"><b>LD :</b> Joueur ⊓ ∃joueEnTantQue.Gardien ⊓ ∀joueEnTantQue.Gardien</div>
+          <div class="pro"><b>Protégé :</b> Joueur and joueEnTantQue some Gardien and joueEnTantQue only Gardien</div>
+          <div class="note">Le ∃ assure d'avoir le poste, le ∀ exclut tout autre poste.</div>
+        </div>
+        <div class="card"><div class="accent"></div>
+          <div class="name">JoueurFairPlay</div>
+          <div class="ld"><b>LD :</b> Joueur ⊓ ∀aRecu.¬Carton</div>
+          <div class="pro"><b>Protégé :</b> Joueur and aRecu only (not Carton)</div>
+          <div class="note">Aucune occurrence de carton, négation classique.</div>
+        </div>
+        <div class="card"><div class="accent"></div>
+          <div class="name">ClubFrancais</div>
+          <div class="ld"><b>LD :</b> Club ⊓ ∃estDans.{France}</div>
+          <div class="pro"><b>Protégé :</b> Club and estDans value France</div>
+          <div class="note">Exploite la transitivité de estDans (Stade → Ville → Pays).</div>
+        </div>
+        <div class="card"><div class="accent"></div>
+          <div class="name">EquipeDilettante</div>
+          <div class="ld"><b>LD :</b> Equipe ⊓ ∀aDispute.¬MatchPhaseEliminatoire</div>
+          <div class="pro"><b>Protégé :</b> Equipe and aDispute only (not MatchPhaseEliminatoire)</div>
+          <div class="note">∀ + négation : équipes qui n'atteignent jamais la phase finale.</div>
+        </div>
+      </div>
+      <div class="band-foot"><span>Soutenance projet ontologie • UE Connaissance et Représentation</span><span class="pg">6 / 12</span></div>
+    </section>
+
+    <!-- ============ Slide 7 — Cardinalités ============ -->
+    <section class="slide" data-page="7">
+      <div class="eyebrow">Étape 4 — 2/2</div>
+      <h1 class="h1">Concepts définis&nbsp;: restrictions de cardinalité</h1>
+
+      <div class="grid-3">
+        <div class="qcard"><span class="pill">≥ 10</span>
+          <div class="name">ButeurExceptionnel</div>
+          <div class="ld"><b>LD</b> Joueur ⊓ ≥10 aMarque.But</div>
+          <div class="pro"><b>Protégé</b> Joueur and aMarque min 10 But</div>
+        </div>
+        <div class="qcard"><span class="pill">= 1</span>
+          <div class="name">ButeurOccasionnel</div>
+          <div class="ld"><b>LD</b> Joueur ⊓ =1 aMarque.But</div>
+          <div class="pro"><b>Protégé</b> Joueur and aMarque exactly 1 But</div>
+        </div>
+        <div class="qcard"><span class="pill">≤ 1</span>
+          <div class="name">JoueurDiscret</div>
+          <div class="ld"><b>LD</b> Joueur ⊓ ≤1 aRecu.Carton</div>
+          <div class="pro"><b>Protégé</b> Joueur and aRecu max 1 Carton</div>
+        </div>
+        <div class="qcard"><span class="pill">≥ 2</span>
+          <div class="name">JoueurPolyvalent</div>
+          <div class="ld"><b>LD</b> Joueur ⊓ ≥2 joueEnTantQue.Position</div>
+          <div class="pro"><b>Protégé</b> Joueur and joueEnTantQue min 2 Position</div>
+        </div>
+        <div class="qcard"><span class="pill">≤ 17</span>
+          <div class="name">PetitClub</div>
+          <div class="ld"><b>LD</b> Club ⊓ ≤17 aPourMembre.Joueur</div>
+          <div class="pro"><b>Protégé</b> Club and aPourMembre max 17 Joueur</div>
+        </div>
+        <div class="qcard"><span class="pill">≥ 3</span>
+          <div class="name">EquipeMultiChampionne</div>
+          <div class="ld"><b>LD</b> Equipe ⊓ ≥3 aRemporte.Trophee</div>
+          <div class="pro"><b>Protégé</b> Equipe and aRemporte min 3 Trophee</div>
+        </div>
+      </div>
+      <div class="band-foot"><span>Soutenance projet ontologie • UE Connaissance et Représentation</span><span class="pg">7 / 12</span></div>
+    </section>
+
+    <!-- ============ Slide 8 — Inférences ============ -->
+    <section class="slide" data-page="8">
+      <div class="eyebrow">Étape 5</div>
+      <h1 class="h1">Ce que le raisonneur HermiT déduit tout seul</h1>
+
+      <div class="inf-list">
+        <div class="inf">
+          <div class="ttl">1.&nbsp;&nbsp;Transitivité de estDans</div>
+          <div class="body">
+            <pre>ParcDesPrinces estLocaliseDans Paris
+Paris aPourPays France
+estLocaliseDans, aPourPays ⊑ estDans  (transitive)</pre>
+            <div class="arrow">⇒</div>
+            <pre class="out">ParisSaintGermain ⊑ ClubFrancais
+ParcDesPrinces estDans France</pre>
+          </div>
+        </div>
+        <div class="inf">
+          <div class="ttl">2.&nbsp;&nbsp;Classification automatique</div>
+          <div class="body">
+            <pre>ThibautCourtois joueEnTantQue Gardien
+seulement Gardien comme poste</pre>
+            <div class="arrow">⇒</div>
+            <pre class="out">ThibautCourtois ∈ GardienDeBut
+RealMadrid ∈ ClubAvecGardien</pre>
+          </div>
+        </div>
+        <div class="inf">
+          <div class="ttl">3.&nbsp;&nbsp;Cardinalités sur les trophées</div>
+          <div class="body">
+            <pre>RealMadrid aRemporte TropheeUCL, UCL_1958,
+            UCL_2020, UCL_2024  (4 trophées distincts)</pre>
+            <div class="arrow">⇒</div>
+            <pre class="out">RealMadrid ∈ EquipeChampionne
+RealMadrid ∈ EquipeMultiChampionne  (≥ 3)</pre>
+          </div>
+        </div>
+      </div>
+      <div class="band-foot"><span>Soutenance projet ontologie • UE Connaissance et Représentation</span><span class="pg">8 / 12</span></div>
+    </section>
+
+    <!-- ============ Slide 9 — Instances ============ -->
+    <section class="slide" data-page="9">
+      <div class="eyebrow">Étape 6</div>
+      <h1 class="h1">Instances clés et test de cohérence</h1>
+
+      <div class="ind-list">
+        <div class="h">Individus modélisés</div>
+        <div class="ind-row"><div class="b"></div><div><b>Real Madrid</b> — 4 trophées UCL, entraîné par C. Ancelotti, gardien T. Courtois</div></div>
+        <div class="ind-row"><div class="b"></div><div><b>Paris Saint-Germain</b> — joue au Parc des Princes, donc inféré ClubFrancais</div></div>
+        <div class="ind-row"><div class="b"></div><div><b>Bayern Munich, Manchester City</b> — clubs européens</div></div>
+        <div class="ind-row"><div class="b"></div><div><b>EA Guingamp</b> — joue au Roudourou (18 462 places, France)</div></div>
+        <div class="ind-row"><div class="b"></div><div><b>Kylian Mbappé</b> — attaquant, joue au Real, nationalité France</div></div>
+        <div class="ind-row"><div class="b"></div><div><b>Désiré Doué</b> — auteur de 10 buts (But1…But10) → ButeurExceptionnel</div></div>
+        <div class="ind-row"><div class="b"></div><div><b>Felix Zwayer</b> — arbitre désigné de la finale UCL 2025</div></div>
+      </div>
+
+      <div class="test">
+        <div class="h">Test de cohérence — démo live</div>
+        <h2>Provoquer une incohérence puis la corriger</h2>
+        <div class="sub">On ajoute</div>
+        <code class="box">Mbappé&nbsp; joueDans&nbsp; BayernMunich</code>
+        <div class="sub">HermiT signale</div>
+        <p><b>joueDans</b> est <b>fonctionnelle</b> ⇒ RealMadrid sameAs BayernMunich, or ils ont été déclarés différents (AllDifferent).</p>
+        <div class="sub">Conclusion</div>
+        <p>L'ontologie est cohérente sans cette assertion : le raisonneur valide bien nos contraintes de modélisation.</p>
+      </div>
+      <div class="band-foot"><span>Soutenance projet ontologie • UE Connaissance et Représentation</span><span class="pg">9 / 12</span></div>
+    </section>
+
+    <!-- ============ Slide 10 — SPARQL ============ -->
+    <section class="slide" data-page="10">
+      <div class="eyebrow">Étape 7</div>
+      <h1 class="h1">Exemple de requête SPARQL</h1>
+
+      <div class="sparql-q">«&nbsp;Quels stades français pourraient accueillir une finale (capacité ≥ 50&nbsp;000)&nbsp;?&nbsp;»</div>
+
+      <div class="sparql-row">
+        <div class="codebox"><span class="lab">Requête</span>PREFIX LDC: &lt;http://www.ensc.fr/ontologies/projet/LDC#&gt;
+PREFIX xsd: &lt;http://www.w3.org/2001/XMLSchema#&gt;
+
+SELECT ?stade ?ville ?cap WHERE {
+  ?stade  a                  LDC:Stade ;
+          LDC:estDans         LDC:France ;
+          LDC:estLocaliseDans ?ville ;
+          LDC:capacite        ?cap .
+  FILTER ( ?cap &gt;= 50000 )
+}
+ORDER BY DESC(?cap)</div>
+        <div class="resbox">
+          <span class="lab">Résultat</span>
+          <table>
+            <thead><tr><th>stade</th><th>ville</th><th style="text-align:right">cap.</th></tr></thead>
+            <tbody><tr><td>—</td><td>—</td><td style="text-align:right">—</td></tr></tbody>
+          </table>
+          <p><b style="color:var(--navy)">Aucun résultat —</b> le ParcDesPrinces (47&nbsp;929) est en dessous, le Roudourou (18&nbsp;462) aussi. Cas pédagogique parfait : la requête répond à la question de compétence n°&nbsp;8 et illustre que les capacités utilisées ne suffisent pas pour une finale.</p>
+        </div>
+      </div>
+      <div class="sparql-foot">3 autres requêtes (top buteurs, multi-champions, capacité moyenne par pays) sont prêtes pour répondre aux questions du jury.</div>
+      <div class="band-foot"><span>Soutenance projet ontologie • UE Connaissance et Représentation</span><span class="pg">10 / 12</span></div>
+    </section>
+
+    <!-- ============ Slide 11 — Difficultés ============ -->
+    <section class="slide" data-page="11">
+      <div class="eyebrow">Étape 8</div>
+      <h1 class="h1">Difficultés rencontrées</h1>
+
+      <div class="diff-grid">
+        <div class="diff">
+          <h3>Hypothèse du monde ouvert</h3>
+          <p>Une requête «&nbsp;max 2 légumes&nbsp;» revenait vide (cf. TP2). Adapté ici : il faut combiner ∀…only avec ∃…some pour contraindre la fermeture, et ne pas confondre absence de fait avec négation.</p>
+        </div>
+        <div class="diff">
+          <h3>Différence entre ⊑ et ≡</h3>
+          <p>Choisir le bon constructeur est crucial : ≡ permet la classification automatique des instances, ⊑ ne fait que contraindre. Tous les concepts définis ont volontairement été passés en ≡.</p>
+        </div>
+        <div class="diff">
+          <h3>Caractéristiques contradictoires</h3>
+          <p>Premier essai : <code>joueDans</code> à la fois fonctionnelle ET inverse fonctionnelle. Cela aurait imposé qu'un joueur et un club soient en bijection — corrigé en gardant uniquement la fonctionnalité côté joueur.</p>
+        </div>
+        <div class="diff">
+          <h3>Déclarations AllDifferent</h3>
+          <p>Sans elles, le raisonneur tolère la fusion de deux individus (sameAs implicite). Toutes les villes / clubs / stades ont été déclarés deux à deux différents.</p>
+        </div>
+        <div class="diff center">
+          <h3>Transitivité utile mais coûteuse</h3>
+          <p><code>estDans</code> est transitive et regroupe <code>estLocaliseDans</code> + <code>aPourPays</code>. Permet de répondre à «&nbsp;clubs français&nbsp;» sans réécrire la chaîne, mais alourdit le raisonnement sur les grands jeux d'instances.</p>
+        </div>
+      </div>
+      <div class="band-foot"><span>Soutenance projet ontologie • UE Connaissance et Représentation</span><span class="pg">11 / 12</span></div>
+    </section>
+
+    <!-- ============ Slide 12 — Bilan ============ -->
+    <section class="slide closing" data-page="12">
+      <div class="halo"></div>
+      <div class="body">
+        <div class="lab">Bilan</div>
+        <h1>Une ontologie LDC complète, cohérente, interrogeable</h1>
+        <ul>
+          <li>27 concepts primitifs et 23 concepts définis</li>
+          <li>Tous les quantificateurs (∃, ∀) et restrictions de cardinalité (≥, ≤, =) couverts</li>
+          <li>21 object properties dont 9 fonctionnelles, 2 transitives, 2 symétriques</li>
+          <li>Cohérence vérifiée par HermiT, classifications automatiques observées</li>
+          <li>8 questions de compétence couvertes, 4+ requêtes SPARQL fonctionnelles</li>
+        </ul>
+      </div>
+      <div class="qa">Merci de votre attention — place aux questions&nbsp;!</div>
+      <div class="meta">Soutenance projet ontologie • 20 mai 2026 • E. Kerguillec</div>
+    </section>
+
+  </div>
+</div>
+
+<div class="nav">
+  <button id="prev" title="Précédent (←)">‹</button>
+  <span class="counter"><span id="cur">1</span> / <span id="tot">12</span></span>
+  <button id="next" title="Suivant (→)">›</button>
+  <span class="sep"></span>
+  <button id="fs" class="fs" title="Plein écran (F)" aria-label="Plein écran">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+      <polyline points="9 3 3 3 3 9"/><polyline points="15 3 21 3 21 9"/>
+      <polyline points="9 21 3 21 3 15"/><polyline points="15 21 21 21 21 15"/>
+    </svg>
+  </button>
+</div>
+
+<script>
+  const slides = document.querySelectorAll('.slide');
+  const total = slides.length;
+  const deck = document.getElementById('deck');
+  const cur = document.getElementById('cur');
+  const tot = document.getElementById('tot');
+  tot.textContent = total;
+  let idx = 0;
+
+  // ---- Sommaire (topbar) injecté dans chaque slide ----
+  const SECTIONS = [
+    { label: "Domaine",          slides: [3] },
+    { label: "Vue globale",      slides: [4] },
+    { label: "Relations",        slides: [5] },
+    { label: "Concepts définis", slides: [6, 7] },
+    { label: "Inférences",       slides: [8] },
+    { label: "Instances",        slides: [9] },
+    { label: "SPARQL",           slides: [10] },
+    { label: "Bilan",            slides: [11, 12] }
+  ];
+
+  slides.forEach((slide, i) => {
+    if (i === 0) return;
+    const tb = document.createElement('div');
+    tb.className = 'topbar';
+    tb.innerHTML =
+      '<div class="logo-box"><img class="logo" src="Logo_ensc.png" alt="Logo ENSC" onerror="this.parentElement.style.display=\'none\'"></div>' +
+      '<nav class="toc">' +
+        SECTIONS.map(s =>
+          `<a href="#${s.slides[0]}" data-slides="${s.slides.join(',')}">${s.label}</a>`
+        ).join('<span class="sep">·</span>') +
+      '</nav>';
+    slide.prepend(tb);
+  });
+  document.querySelectorAll('.band-foot .pg').forEach(el => el.remove());
+
+  function refreshTOC(){
+    const n = idx + 1;
+    document.querySelectorAll('.topbar .toc a').forEach(a => {
+      const arr = a.dataset.slides.split(',').map(Number);
+      a.classList.toggle('cur', arr.includes(n));
+    });
+  }
+
+  // ---- Affichage d'une slide ----
+  function show(i){
+    idx = Math.max(0, Math.min(total - 1, i));
+    slides.forEach((s, k) => s.classList.toggle('active', k === idx));
+    cur.textContent = idx + 1;
+    history.replaceState(null, '', '#' + (idx + 1));
+    refreshTOC();
+    positionNav();
+  }
+
+  // Mise à l'échelle pour adapter la slide à la fenêtre
+  function fit(){
+    const stage = document.querySelector('.stage');
+    const sw = stage.clientWidth, sh = stage.clientHeight;
+    const dw = 1280, dh = 720;
+    const factor = document.fullscreenElement ? 1 : 0.96;
+    const scale = Math.min(sw / dw, sh / dh) * factor;
+    deck.style.transform = `scale(${scale})`;
+    positionNav();
+  }
+
+  function positionNav(){
+    const stage = document.querySelector('.stage');
+    const sw = stage.clientWidth, sh = stage.clientHeight;
+    const dh = 720, dw = 1280;
+    const factor = document.fullscreenElement ? 1 : 0.96;
+    const scale = Math.min(sw / dw, sh / dh) * factor;
+    const scaledH = dh * scale;
+    const scaledW = dw * scale;
+    const slideBottom = (sh - scaledH) / 2;
+    const bandCenter = idx === 0 ? 10 * scale : idx === total - 1 ? 18 * scale : 17 * scale;
+    const navEl = document.querySelector('.nav');
+    navEl.style.bottom = (slideBottom + bandCenter) + 'px';
+    navEl.style.left = 'auto';
+    navEl.style.right = ((sw - scaledW) / 2 + 28 * scale) + 'px';
+    navEl.style.transform = 'translateY(50%)';
+  }
+
+  window.addEventListener('resize', fit);
+  fit();
+
+  // ---- Navigation flèches ----
+  document.getElementById('prev').onclick = () => show(idx - 1);
+  document.getElementById('next').onclick = () => show(idx + 1);
+
+  // ---- Bouton plein écran (toggle entrée / sortie) ----
+  const fsBtn = document.getElementById('fs');
+  const ICON_ENTER = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 3 3 3 3 9"/><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><polyline points="15 21 21 21 21 15"/></svg>';
+  const ICON_EXIT  = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="3 9 9 9 9 3"/><polyline points="21 9 15 9 15 3"/><polyline points="3 15 9 15 9 21"/><polyline points="21 15 15 15 15 21"/></svg>';
+
+  fsBtn.onclick = () => {
+    if (!document.fullscreenElement) document.documentElement.requestFullscreen();
+    else document.exitFullscreen();
+  };
+  document.addEventListener('fullscreenchange', () => {
+    const inFs = !!document.fullscreenElement;
+    fsBtn.innerHTML = inFs ? ICON_EXIT : ICON_ENTER;
+    fsBtn.title = inFs ? 'Quitter le plein écran (F ou Échap)' : 'Plein écran (F)';
+    fit();
+  });
+
+  // ---- Raccourcis clavier ----
+  document.addEventListener('keydown', (e) => {
+    if (['ArrowRight','PageDown',' '].includes(e.key)) { e.preventDefault(); show(idx + 1); }
+    else if (['ArrowLeft','PageUp'].includes(e.key)) { e.preventDefault(); show(idx - 1); }
+    else if (e.key === 'Home') show(0);
+    else if (e.key === 'End') show(total - 1);
+    else if (e.key === 'f' || e.key === 'F') {
+      if (!document.fullscreenElement) document.documentElement.requestFullscreen();
+      else document.exitFullscreen();
+    }
+    else if (e.key === 'p' || e.key === 'P') window.print();
+  });
+
+  // ---- Navigation au scroll de la souris ----
+  let scrollLock = false;
+  window.addEventListener('wheel', (e) => {
+    if (scrollLock) return;
+    scrollLock = true;
+    if (e.deltaY > 30) show(idx + 1);
+    else if (e.deltaY < -30) show(idx - 1);
+    setTimeout(() => scrollLock = false, 350);
+  }, { passive: true });
+
+  // ---- Saut depuis le sommaire (clic sur un lien #N) ----
+  window.addEventListener('hashchange', () => {
+    const m = location.hash.match(/#(\d+)/);
+    if (m) show(parseInt(m[1], 10) - 1);
+  });
+
+  // ---- Hash initial (#3 → slide 3) ----
+  const m = location.hash.match(/#(\d+)/);
+  if (m) show(parseInt(m[1], 10) - 1);
+
+  // Premier marquage du sommaire
+  refreshTOC();
+</script>
+</body>
+</html>
