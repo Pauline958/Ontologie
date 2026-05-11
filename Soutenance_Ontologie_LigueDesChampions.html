@@ -317,8 +317,8 @@
         <h1>Ontologie de la <span class="sub">Ligue des Champions</span></h1>
         <div class="lead">Modélisation, raisonnement et requêtes SPARQL sur le football européen.</div>
         <div class="rule"></div>
-        <div class="author">Emma Kerguillec
-          <small>Soutenance — 20 mai 2026</small>
+        <div class="author">Emma Kerguillec - Pauline Mesples
+          <small>Soutenance - 20 mai 2026</small>
         </div>
       </div>
     </section>
@@ -408,7 +408,7 @@
         <div class="char"><div class="v">2</div><div class="l">transitives</div></div>
         <div class="char"><div class="v">2</div><div class="l">symétriques</div></div>
         <div class="char"><div class="v">1</div><div class="l">irréflexive</div></div>
-        <div class="char"><div class="v">5</div><div class="l">couples inverse</div></div>
+        <div class="char"><div class="v">3</div><div class="l">couples inverses</div></div>
       </div>
 
       <div class="rel-table">
@@ -437,7 +437,7 @@
         <div class="card"><div class="accent"></div>
           <div class="name">GardienDeBut</div>
           <div class="ld"><b>LD :</b> Joueur ⊓ ∃joueEnTantQue.Gardien ⊓ ∀joueEnTantQue.Gardien</div>
-          <div class="pro"><b>Protégé :</b> Joueur and joueEnTantQue some Gardien and joueEnTantQue only Gardien</div>
+          <div class="pro"><b>Protégé :</b> Joueur and (joueEnTantQue some Gardien) </div>
           <div class="note">Le ∃ assure d'avoir le poste, le ∀ exclut tout autre poste.</div>
         </div>
         <div class="card"><div class="accent"></div>
@@ -453,7 +453,7 @@
           <div class="note">Exploite la transitivité de estDans (Stade → Ville → Pays).</div>
         </div>
         <div class="card"><div class="accent"></div>
-          <div class="name">EquipeDilettante</div>
+          <div class="name">EquipeQualifieeDoffice</div>
           <div class="ld"><b>LD :</b> Equipe ⊓ ∀aDispute.¬MatchPhaseEliminatoire</div>
           <div class="pro"><b>Protégé :</b> Equipe and aDispute only (not MatchPhaseEliminatoire)</div>
           <div class="note">∀ + négation : équipes qui n'atteignent jamais la phase finale.</div>
@@ -505,7 +505,7 @@
     <!-- ============ Slide 8 — Inférences ============ -->
     <section class="slide" data-page="8">
       <div class="eyebrow">Étape 5</div>
-      <h1 class="h1">Ce que le raisonneur HermiT déduit tout seul</h1>
+      <h1 class="h1">Ce que le raisonneur Pellet déduit tout seul</h1>
 
       <div class="inf-list">
         <div class="inf">
@@ -516,7 +516,9 @@ Paris aPourPays France
 estLocaliseDans, aPourPays ⊑ estDans  (transitive)</pre>
             <div class="arrow">⇒</div>
             <pre class="out">ParisSaintGermain ⊑ ClubFrancais
-ParcDesPrinces estDans France</pre>
+ParcDesPrinces estDans France
+ParisSaintGermain
+</pre>
           </div>
         </div>
         <div class="inf">
@@ -550,7 +552,7 @@ RealMadrid ∈ EquipeMultiChampionne  (≥ 3)</pre>
 
       <div class="ind-list">
         <div class="h">Individus modélisés</div>
-        <div class="ind-row"><div class="b"></div><div><b>Real Madrid</b> — 4 trophées UCL, entraîné par C. Ancelotti, gardien T. Courtois</div></div>
+        <div class="ind-row"><div class="b"></div><div><b>Real Madrid</b> — 4 trophées UCL, entraîné par Carlo Ancelotti, gardien T. Courtois, attanquant K. Mbappé</div></div>
         <div class="ind-row"><div class="b"></div><div><b>Paris Saint-Germain</b> — joue au Parc des Princes, donc inféré ClubFrancais</div></div>
         <div class="ind-row"><div class="b"></div><div><b>Bayern Munich, Manchester City</b> — clubs européens</div></div>
         <div class="ind-row"><div class="b"></div><div><b>EA Guingamp</b> — joue au Roudourou (18 462 places, France)</div></div>
@@ -649,7 +651,7 @@ ORDER BY DESC(?cap)</div>
         </ul>
       </div>
       <div class="qa">Merci de votre attention — place aux questions&nbsp;!</div>
-      <div class="meta">Soutenance projet ontologie • 20 mai 2026 • E. Kerguillec</div>
+      <div class="meta">Soutenance projet ontologie • 20 mai 2026 • E. Kerguillec - P. Mesples</div>
     </section>
 
   </div>
