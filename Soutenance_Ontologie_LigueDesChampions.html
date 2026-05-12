@@ -318,21 +318,20 @@
         <div class="lead">Modélisation, raisonnement et requêtes SPARQL sur le football européen.</div>
         <div class="rule"></div>
         <div class="author">Emma Kerguillec - Pauline Mesples
-          <small>Soutenance - 20 mai 2026</small>
+          <small>Soutenance - 13 mai 2026</small>
         </div>
       </div>
     </section>
 
     <!-- ============ Slide 2 — Plan ============ -->
     <section class="slide" data-page="2">
-      <div class="eyebrow">Déroulé — 10 min</div>
-      <h1 class="h1">Plan de la présentation</h1>
+      <h1 class="h1">Sommaire</h1>
       <div class="plan-grid">
-        <div class="plan-item"><div class="plan-num">1</div><div class="plan-text">Domaine et questions de compétence</div></div>
-        <div class="plan-item"><div class="plan-num">2</div><div class="plan-text">Vue globale&nbsp;: hiérarchie de concepts</div></div>
+        <div class="plan-item"><div class="plan-num">1</div><div class="plan-text">Introduction</div></div>
+        <div class="plan-item"><div class="plan-num">2</div><div class="plan-text">Hiérarchie de concepts</div></div>
         <div class="plan-item"><div class="plan-num">3</div><div class="plan-text">Relations et caractéristiques</div></div>
         <div class="plan-item"><div class="plan-num">4</div><div class="plan-text">Concepts définis en logique de description</div></div>
-        <div class="plan-item"><div class="plan-num">5</div><div class="plan-text">Inférences automatiques du raisonneur</div></div>
+        <div class="plan-item"><div class="plan-num">5</div><div class="plan-text">Raisonneur</div></div>
         <div class="plan-item"><div class="plan-num">6</div><div class="plan-text">Instances et test de cohérence</div></div>
         <div class="plan-item"><div class="plan-num">7</div><div class="plan-text">Requêtes SPARQL</div></div>
         <div class="plan-item"><div class="plan-num">8</div><div class="plan-text">Difficultés et conclusion</div></div>
@@ -342,29 +341,29 @@
 
     <!-- ============ Slide 3 — Domaine ============ -->
     <section class="slide" data-page="3">
-      <div class="eyebrow">Étape 1</div>
-      <h1 class="h1">Domaine et questions de compétence</h1>
+      <h1 class="h1">1. Introduction</h1>
 
       <div class="two-col">
         <div class="perimeter">
-          <div class="lab">Périmètre</div>
           <h2>La Ligue des Champions de l'UEFA</h2>
+          <h4>Saison 2024-2025 : nouveau format à 36 clubs => données sportives plus complexes</h4>
           <ul>
             <li>Acteurs&nbsp;: joueurs, entraîneurs, arbitres.</li>
             <li>Structures&nbsp;: clubs, confédérations, pays, villes, stades.</li>
             <li>Compétition&nbsp;: matches, tours, finales, saisons, trophées.</li>
             <li>Événements de jeu&nbsp;: buts, cartons (jaunes / rouges).</li>
+            <p>=> volonté de créer une base sémantique capable de répondre à des requêtes complexes</p>
+            <p>L'ontologie pourra être utilisée par Panini pour créer un album de la Ligue des Champions avec des stickers de chaque joueur</p>
           </ul>
         </div>
         <div class="questions">
-          <div class="lab">Questions auxquelles l'ontologie répond</div>
-          <h2>8 questions de compétence</h2>
+          <div class="lab">Exemples de questions auxquelles l'ontologie répond</div>
           <ol class="qlist">
-            <li><span class="qn">1.</span> Quels joueurs évoluent dans un club français&nbsp;?</li>
-            <li><span class="qn">2.</span> Quels clubs ont remporté ≥ 3 fois la Ligue des Champions&nbsp;?</li>
-            <li><span class="qn">3.</span> Quels matches se sont joués au Santiago-Bernabéu&nbsp;?</li>
+            <li><span class="qn">1.</span> Quels joueurs jouent dans un club français&nbsp;?</li>
+            <li><span class="qn">2.</span> Quels clubs ont remporté au moins 3 fois la Ligue des Champions&nbsp;?</li>
+            <li><span class="qn">3.</span> Quels matchs se sont joués au Santiago-Bernabéu&nbsp;?</li>
             <li><span class="qn">4.</span> Quels joueurs ont marqué plus de 10 buts&nbsp;?</li>
-            <li><span class="qn">5.</span> Quels arbitres ont officié sur une finale&nbsp;?</li>
+            <li><span class="qn">5.</span> Quels arbitres ont arbitré lors d'une finale&nbsp;?</li>
             <li><span class="qn">6.</span> Quels clubs européens n'ont aucun gardien recensé&nbsp;?</li>
             <li><span class="qn">7.</span> Quels joueurs ont reçu un carton rouge en finale&nbsp;?</li>
             <li><span class="qn">8.</span> Quels stades sont localisés en Espagne&nbsp;?</li>
@@ -376,8 +375,7 @@
 
     <!-- ============ Slide 4 — Vue globale ============ -->
     <section class="slide" data-page="4">
-      <div class="eyebrow">Étape 2</div>
-      <h1 class="h1">Vue globale&nbsp;: hiérarchie de concepts</h1>
+      <h1 class="h1">2. Hiérarchie de concepts</h1>
 
       <div class="stat-row">
         <div class="stat"><div class="num">27</div><div class="lbl">concepts primitifs</div></div>
@@ -399,8 +397,7 @@
 
     <!-- ============ Slide 5 — Relations ============ -->
     <section class="slide" data-page="5">
-      <div class="eyebrow">Étape 3</div>
-      <h1 class="h1">Object properties et caractéristiques</h1>
+      <h1 class="h1">3. Relations et caractéristiques</h1>
 
       <div class="char-row">
         <div class="char"><div class="v">9</div><div class="l">fonctionnelles</div></div>
@@ -430,8 +427,7 @@
 
     <!-- ============ Slide 6 — Quantificateurs ∃ et ∀ ============ -->
     <section class="slide" data-page="6">
-      <div class="eyebrow">Étape 4 — 1/2</div>
-      <h1 class="h1">Concepts définis&nbsp;: quantificateurs ∃ et ∀</h1>
+      <h1 class="h1">4. Concepts définis&nbsp;: quantificateurs ∃ et ∀</h1>
 
       <div class="grid-2">
         <div class="card"><div class="accent"></div>
@@ -464,8 +460,7 @@
 
     <!-- ============ Slide 7 — Cardinalités ============ -->
     <section class="slide" data-page="7">
-      <div class="eyebrow">Étape 4 — 2/2</div>
-      <h1 class="h1">Concepts définis&nbsp;: restrictions de cardinalité</h1>
+      <h1 class="h1">4. Concepts définis&nbsp;: restrictions de cardinalité</h1>
 
       <div class="grid-3">
         <div class="qcard"><span class="pill">≥ 10</span>
@@ -504,8 +499,7 @@
 
     <!-- ============ Slide 8 — Inférences ============ -->
     <section class="slide" data-page="8">
-      <div class="eyebrow">Étape 5</div>
-      <h1 class="h1">Ce que le raisonneur Pellet déduit tout seul</h1>
+      <h1 class="h1">5. Raisonneur</h1>
 
       <div class="inf-list">
         <div class="inf">
@@ -547,8 +541,7 @@ RealMadrid ∈ EquipeMultiChampionne  (≥ 3)</pre>
 
     <!-- ============ Slide 9 — Instances ============ -->
     <section class="slide" data-page="9">
-      <div class="eyebrow">Étape 6</div>
-      <h1 class="h1">Instances clés et test de cohérence</h1>
+      <h1 class="h1">6. Instances clés et test de cohérence</h1>
 
       <div class="ind-list">
         <div class="h">Individus modélisés</div>
@@ -576,8 +569,7 @@ RealMadrid ∈ EquipeMultiChampionne  (≥ 3)</pre>
 
     <!-- ============ Slide 10 — SPARQL ============ -->
     <section class="slide" data-page="10">
-      <div class="eyebrow">Étape 7</div>
-      <h1 class="h1">Exemple de requête SPARQL</h1>
+      <h1 class="h1">7. Exemple de requêtes SPARQL</h1>
 
       <div class="sparql-q">«&nbsp;Quels stades français pourraient accueillir une finale (capacité ≥ 50&nbsp;000)&nbsp;?&nbsp;»</div>
 
@@ -608,13 +600,12 @@ ORDER BY DESC(?cap)</div>
 
     <!-- ============ Slide 11 — Difficultés ============ -->
     <section class="slide" data-page="11">
-      <div class="eyebrow">Étape 8</div>
-      <h1 class="h1">Difficultés rencontrées</h1>
+      <h1 class="h1">8. Difficultés rencontrées</h1>
 
       <div class="diff-grid">
         <div class="diff">
           <h3>Hypothèse du monde ouvert</h3>
-          <p>Une requête «&nbsp;max 2 légumes&nbsp;» revenait vide (cf. TP2). Adapté ici : il faut combiner ∀…only avec ∃…some pour contraindre la fermeture, et ne pas confondre absence de fait avec négation.</p>
+          <p>Il faut combiner ∀…only avec ∃…some pour contraindre la fermeture, et ne pas confondre absence de fait avec négation.</p>
         </div>
         <div class="diff">
           <h3>Différence entre ⊑ et ≡</h3>
@@ -622,7 +613,7 @@ ORDER BY DESC(?cap)</div>
         </div>
         <div class="diff">
           <h3>Caractéristiques contradictoires</h3>
-          <p>Premier essai : <code>joueDans</code> à la fois fonctionnelle ET inverse fonctionnelle. Cela aurait imposé qu'un joueur et un club soient en bijection — corrigé en gardant uniquement la fonctionnalité côté joueur.</p>
+          <p>Premier essai : <code>joueDans</code> à la fois fonctionnelle ET inverse fonctionnelle. Cela aurait imposé qu'un joueur et un club soient en bijection : corrigé en gardant uniquement la fonctionnalité côté joueur.</p>
         </div>
         <div class="diff">
           <h3>Déclarations AllDifferent</h3>
@@ -640,18 +631,18 @@ ORDER BY DESC(?cap)</div>
     <section class="slide closing" data-page="12">
       <div class="halo"></div>
       <div class="body">
-        <div class="lab">Bilan</div>
+        <div class="lab">Conclusion</div>
         <h1>Une ontologie LDC complète, cohérente, interrogeable</h1>
         <ul>
           <li>27 concepts primitifs et 23 concepts définis</li>
           <li>Tous les quantificateurs (∃, ∀) et restrictions de cardinalité (≥, ≤, =) couverts</li>
-          <li>21 object properties dont 9 fonctionnelles, 2 transitives, 2 symétriques</li>
-          <li>Cohérence vérifiée par HermiT, classifications automatiques observées</li>
-          <li>8 questions de compétence couvertes, 4+ requêtes SPARQL fonctionnelles</li>
+          <li>21 relations dont 9 fonctionnelles, 2 transitives, 2 symétriques</li>
+          <li>Cohérence vérifiée, classifications automatiques observées</li>
+          <li>4 requêtes SPARQL fonctionnelles</li>
         </ul>
       </div>
-      <div class="qa">Merci de votre attention — place aux questions&nbsp;!</div>
-      <div class="meta">Soutenance projet ontologie • 20 mai 2026 • E. Kerguillec - P. Mesples</div>
+      <div class="qa">Merci de votre attention !</div>
+      <div class="meta">Soutenance projet ontologie • 12 mai 2026 • E. Kerguillec - P. Mesples</div>
     </section>
 
   </div>
@@ -681,11 +672,11 @@ ORDER BY DESC(?cap)</div>
 
   // ---- Sommaire (topbar) injecté dans chaque slide ----
   const SECTIONS = [
-    { label: "Domaine",          slides: [3] },
-    { label: "Vue globale",      slides: [4] },
+    { label: "Introduction",          slides: [3] },
+    { label: "Hiérarchie",      slides: [4] },
     { label: "Relations",        slides: [5] },
     { label: "Concepts définis", slides: [6, 7] },
-    { label: "Inférences",       slides: [8] },
+    { label: "Raisonneur",       slides: [8] },
     { label: "Instances",        slides: [9] },
     { label: "SPARQL",           slides: [10] },
     { label: "Bilan",            slides: [11, 12] }
