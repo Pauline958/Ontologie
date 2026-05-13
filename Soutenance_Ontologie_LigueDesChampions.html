@@ -232,7 +232,7 @@
 
   /* ---------- Slide 10 (sparql) ---------- */
   .sparql-q{position:absolute;left:54px;right:54px;top:200px;font-family:Georgia,serif;font-style:italic;font-size:18px;color:var(--navy);font-weight:700}
-  .sparql-row{position:absolute;left:54px;right:54px;top:260px;bottom:90px;display:grid;grid-template-columns:1.5fr 1fr;gap:20px}
+  .sparql-row{position:absolute;left:54px;right:54px;top:260px;bottom:90px;display:grid;grid-template-columns:1fr 1fr;gap:20px}
   .codebox{background:var(--navy-deep);color:var(--silver);border-radius:10px;padding:20px;font-family:Consolas,"Courier New",monospace;font-size:13.5px;line-height:1.45;white-space:pre;overflow:hidden}
   .codebox .lab{font-size:10px;letter-spacing:.32em;color:var(--gold);font-weight:700;font-family:Calibri,Arial,sans-serif;display:block;margin-bottom:10px;text-transform:uppercase}
   .resbox{background:var(--cream);border:1px solid #e7e2cf;border-radius:10px;padding:20px}
@@ -241,6 +241,7 @@
   .resbox th{background:var(--navy);color:#fff;text-align:left;padding:6px 10px}
   .resbox td{padding:8px 10px;border-bottom:1px solid var(--silver);text-align:center;color:var(--text)}
   .resbox p{margin:0;font-size:12px;line-height:1.5}
+  .resbox img{max-width:100%;max-height:140px; min-height: 140px;object-fit:contain;display:block;margin-bottom:10px}
   .sparql-foot{position:absolute;left:54px;right:54px;bottom:50px;text-align:center;color:var(--muted);font-style:italic;font-size:12.5px}
 
   /* ---------- Slide 11 (difficultés) ---------- */
@@ -555,15 +556,17 @@ RealMadrid ∈ EquipeMultiChampionne  (≥ 3)</pre>
       </div>
 
       <div class="test">
-        <div class="h">Test de cohérence — démo live</div>
+        <div class="h">Test de cohérence </div>
         <h2>Provoquer une incohérence puis la corriger</h2>
         <div class="sub">On ajoute</div>
         <code class="box">Mbappé&nbsp; joueDans&nbsp; BayernMunich</code>
-        <div class="sub">HermiT signale</div>
+        <div class="sub">Pellet signale un problème</div>
         <p><b>joueDans</b> est <b>fonctionnelle</b> ⇒ RealMadrid sameAs BayernMunich, or ils ont été déclarés différents (AllDifferent).</p>
         <div class="sub">Conclusion</div>
         <p>L'ontologie est cohérente sans cette assertion : le raisonneur valide bien nos contraintes de modélisation.</p>
       </div>
+      <img src="reasonner.png" style="position:absolute;bottom:40px;left:54px;max-height:170px;max-width:44%;object-fit:contain"/>
+      <img src="messerreur.png" style="position:absolute;bottom:40px;right:54px;max-height:170px;max-width:44%;object-fit:contain"/>
       <div class="band-foot"><span>Soutenance projet ontologie • UE Connaissance et Représentation</span><span class="pg">9 / 12</span></div>
     </section>
 
@@ -571,35 +574,125 @@ RealMadrid ∈ EquipeMultiChampionne  (≥ 3)</pre>
     <section class="slide" data-page="10">
       <h1 class="h1">7. Exemple de requêtes SPARQL</h1>
 
-      <div class="sparql-q">«&nbsp;Quels stades français pourraient accueillir une finale (capacité ≥ 50&nbsp;000)&nbsp;?&nbsp;»</div>
+      <div class="sparql-q">«&nbsp;Quels matchs ont été joués au Santiago Bernabeu, et quel était l'arbitre&nbsp;?&nbsp;»</div>
 
       <div class="sparql-row">
-        <div class="codebox"><span class="lab">Requête</span>PREFIX LDC: &lt;http://www.ensc.fr/ontologies/projet/LDC#&gt;
-PREFIX xsd: &lt;http://www.w3.org/2001/XMLSchema#&gt;
+        <div class="codebox"><span class="lab">Requête</span>
 
-SELECT ?stade ?ville ?cap WHERE {
-  ?stade  a                  LDC:Stade ;
-          LDC:estDans         LDC:France ;
-          LDC:estLocaliseDans ?ville ;
-          LDC:capacite        ?cap .
-  FILTER ( ?cap &gt;= 50000 )
+PREFIX owl: &lt;http://www.w3.org/2002/07/owl#&gt;
+PREFIX rdf: &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#&gt;
+PREFIX rdfs: &lt;http://www.w3.org/2000/01/rdf-schema#&gt;
+PREFIX ucl: &lt;http://www.ensc.fr/ontologies/projet/LDC#&gt;
+
+
+SELECT ?match ?arbitre ?annee WHERE {
+  ?match ucl:estJoueDans ucl:SantiagoBernabeu .
+  OPTIONAL { ?match ucl:aPourArbitre ?arbitre . }
+  ?match ucl:aPourSaison ?saison .
+  ?saison ucl:annee ?annee .
 }
-ORDER BY DESC(?cap)</div>
+</div>
         <div class="resbox">
           <span class="lab">Résultat</span>
-          <table>
-            <thead><tr><th>stade</th><th>ville</th><th style="text-align:right">cap.</th></tr></thead>
-            <tbody><tr><td>—</td><td>—</td><td style="text-align:right">—</td></tr></tbody>
-          </table>
-          <p><b style="color:var(--navy)">Aucun résultat —</b> le ParcDesPrinces (47&nbsp;929) est en dessous, le Roudourou (18&nbsp;462) aussi. Cas pédagogique parfait : la requête répond à la question de compétence n°&nbsp;8 et illustre que les capacités utilisées ne suffisent pas pour une finale.</p>
+          <img src="arbitrefinale.png"/>
+          </div>
+      </div>
+      <div class="sparql-foot"> </div> 
+      <div class="band-foot"><span>Soutenance projet ontologie • UE Connaissance et Représentation</span><span class="pg">10 / 12</span></div>
+    </section>
+          <!-- <p><b style="color:var(--navy)">Aucun résultat —</b> le ParcDesPrinces (47&nbsp;929) est en dessous, le Roudourou (18&nbsp;462) aussi. Cas pédagogique parfait : la requête répond à la question de compétence n°&nbsp;8 et illustre que les capacités utilisées ne suffisent pas pour une finale.</p>
         </div>
       </div>
-      <div class="sparql-foot">3 autres requêtes (top buteurs, multi-champions, capacité moyenne par pays) sont prêtes pour répondre aux questions du jury.</div>
+      <div class="sparql-foot"> </div> 
+      <div class="band-foot"><span>Soutenance projet ontologie • UE Connaissance et Représentation</span><span class="pg">10 / 12</span></div>
+    </section>
+ -->
+
+    <!-- ============ Slide 11 — SPARQL ============ -->
+    <section class="slide" data-page="11">
+      <h1 class="h1">7. Exemple de requêtes SPARQL</h1>
+
+      <div class="sparql-q">«&nbsp; Quelle est la capacité moyenne des stades de chaque pays ?&nbsp;»</div>
+
+      <div class="sparql-row">
+        <div class="codebox"><span class="lab">Requête</span>
+PREFIX owl: &lt;http://www.w3.org/2002/07/owl#&gt;
+PREFIX rdf: &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#&gt;
+PREFIX rdfs: &lt;http://www.w3.org/2000/01/rdf-schema#&gt;
+PREFIX ucl: &lt;http://www.ensc.fr/ontologies/projet/LDC#&gt;
+
+SELECT ?pays (AVG(?cap) AS ?capMoyenne) WHERE {
+  ?stade rdf:type ucl:Stade .
+  ?stade ucl:capacite ?cap .
+  ?stade ucl:estLocaliseDans ?ville .
+  ?ville  ucl:aPourPays ?pays .
+} GROUP BY ?pays ORDER BY DESC(?capMoyenne)</div>
+        <div class="resbox">
+          <span class="lab">Résultat</span>
+          <img src="capacitémoy.png"/>
+        </div>
+      </div>
+      <div class="sparql-foot"> </div> 
       <div class="band-foot"><span>Soutenance projet ontologie • UE Connaissance et Représentation</span><span class="pg">10 / 12</span></div>
     </section>
 
-    <!-- ============ Slide 11 — Difficultés ============ -->
-    <section class="slide" data-page="11">
+    <!-- ============ Slide 12 — SPARQL ============ -->
+    <section class="slide" data-page="12">
+      <h1 class="h1">7. Exemple de requêtes SPARQL</h1>
+
+      <div class="sparql-q">«&nbsp;Quels joueurs ont marqué au moins 10 buts (ButeurExceptionnel)&nbsp;?&nbsp;»</div>
+
+      <div class="sparql-row">
+        <div class="codebox"><span class="lab">Requête</span>
+PREFIX owl: &lt;http://www.w3.org/2002/07/owl#&gt;
+PREFIX rdf: &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#&gt;
+PREFIX rdfs: &lt;http://www.w3.org/2000/01/rdf-schema#&gt;
+PREFIX ucl: &lt;http://www.ensc.fr/ontologies/projet/LDC#&gt;
+
+SELECT ?joueur (COUNT(?but) AS ?nbButs) WHERE {
+  ?joueur ucl:aMarque ?but .
+} GROUP BY ?joueur HAVING (COUNT(?but) >= 10)
+ORDER BY DESC(?nbButs)
+</div>
+        <div class="resbox">
+          <span class="lab">Résultat</span>
+          <img src="sparqlnbbut.png"/>
+          </div>
+      </div>
+      <div class="sparql-foot"> </div> 
+      <div class="band-foot"><span>Soutenance projet ontologie • UE Connaissance et Représentation</span><span class="pg">10 / 12</span></div>
+    </section>
+
+    <!-- ============ Slide 13 — SPARQL ============ -->
+    <section class="slide" data-page="13">
+      <h1 class="h1">7. Exemple de requêtes SPARQL</h1>
+
+      <div class="sparql-q">«&nbsp;Quels joueurs ont reçu un carton rouge lors d'une finale&nbsp;?&nbsp;»</div>
+
+      <div class="sparql-row">
+        <div class="codebox"><span class="lab">Requête</span>
+PREFIX owl: &lt;http://www.w3.org/2002/07/owl#&gt;
+PREFIX rdf: &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#&gt;
+PREFIX rdfs: &lt;http://www.w3.org/2000/01/rdf-schema#&gt;
+PREFIX ucl: &lt;http://www.ensc.fr/ontologies/projet/LDC#&gt;
+
+SELECT DISTINCT ?joueur ?match WHERE {
+  ?match rdf:type ucl:Finale .
+  ?joueur ucl:aJoue ?match .
+  ?joueur ucl:aRecu ?carton .
+  ?carton rdf:type ucl:CartonRouge .
+}</div>
+        <div class="resbox">
+          <span class="lab">Résultat</span>
+          <img src="sparqlcarton.png"/>
+          </div>
+      </div>
+      <div class="sparql-foot"> </div> 
+      <div class="band-foot"><span>Soutenance projet ontologie • UE Connaissance et Représentation</span><span class="pg">10 / 12</span></div>
+    </section>
+
+    <!-- ============ Slide 14 — Difficultés ============ -->
+    <section class="slide" data-page="14">
       <h1 class="h1">8. Difficultés rencontrées</h1>
 
       <div class="diff-grid">
@@ -627,8 +720,8 @@ ORDER BY DESC(?cap)</div>
       <div class="band-foot"><span>Soutenance projet ontologie • UE Connaissance et Représentation</span><span class="pg">11 / 12</span></div>
     </section>
 
-    <!-- ============ Slide 12 — Bilan ============ -->
-    <section class="slide closing" data-page="12">
+    <!-- ============ Slide 15 — Bilan ============ -->
+    <section class="slide closing" data-page="15">
       <div class="halo"></div>
       <div class="body">
         <div class="lab">Conclusion</div>
@@ -650,7 +743,7 @@ ORDER BY DESC(?cap)</div>
 
 <div class="nav">
   <button id="prev" title="Précédent (←)">‹</button>
-  <span class="counter"><span id="cur">1</span> / <span id="tot">12</span></span>
+  <span class="counter"><span id="cur">1</span> / <span id="tot">15</span></span>
   <button id="next" title="Suivant (→)">›</button>
   <span class="sep"></span>
   <button id="fs" class="fs" title="Plein écran (F)" aria-label="Plein écran">
