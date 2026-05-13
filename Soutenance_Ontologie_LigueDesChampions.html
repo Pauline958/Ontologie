@@ -351,7 +351,7 @@
           <ul>
             <li>Acteurs&nbsp;: joueurs, entraîneurs, arbitres.</li>
             <li>Structures&nbsp;: clubs, confédérations, pays, villes, stades.</li>
-            <li>Compétition&nbsp;: matches, tours, finales, saisons, trophées.</li>
+            <li>Compétition&nbsp;: matchs, tours, finales, saisons, trophées.</li>
             <li>Événements de jeu&nbsp;: buts, cartons (jaunes / rouges).</li>
             <p>=> volonté de créer une base sémantique capable de répondre à des requêtes complexes</p>
             <p>L'ontologie pourra être utilisée par Panini pour créer un album de la Ligue des Champions avec des stickers de chaque joueur</p>
@@ -360,14 +360,14 @@
         <div class="questions">
           <div class="lab">Exemples de questions auxquelles l'ontologie répond</div>
           <ol class="qlist">
-            <li><span class="qn">1.</span> Quels joueurs jouent dans un club français&nbsp;?</li>
-            <li><span class="qn">2.</span> Quels clubs ont remporté au moins 3 fois la Ligue des Champions&nbsp;?</li>
-            <li><span class="qn">3.</span> Quels matchs se sont joués au Santiago-Bernabéu&nbsp;?</li>
-            <li><span class="qn">4.</span> Quels joueurs ont marqué plus de 10 buts&nbsp;?</li>
-            <li><span class="qn">5.</span> Quels arbitres ont arbitré lors d'une finale&nbsp;?</li>
-            <li><span class="qn">6.</span> Quels clubs européens n'ont aucun gardien recensé&nbsp;?</li>
-            <li><span class="qn">7.</span> Quels joueurs ont reçu un carton rouge en finale&nbsp;?</li>
-            <li><span class="qn">8.</span> Quels stades sont localisés en Espagne&nbsp;?</li>
+            <li><span class="qn">1.</span> Quels matchs ont été joués au Santiago Bernabeu et quel était l'arbitre ?</li>
+            <li><span class="qn">2.</span> Quelle est la capacité moyenne des stades de chaque pays ?</li>
+            <li><span class="qn">3.</span> Quels joueurs ont marqué au moins 10 buts (ButeurExceptionnel) ?</li>
+            <li><span class="qn">4.</span> Quels joueurs ont reçu un carton rouge lors d'une finale ?</li>
+            <li><span class="qn">5.</span> Quels clubs ont remporté au moins trois trophées (multi-champions) ?</li>
+            <li><span class="qn">6.</span> Quels joueurs ont reçu un carton rouge dans une finale ?</li>
+            <li><span class="qn">7.</span> Quelle est la capacité moyenne des stades par pays ?</li>
+            <li><span class="qn">8.</span> Qui a entraîné un club ayant gagné la Ligue des Champions ?</li>
           </ol>
         </div>
       </div>
@@ -546,7 +546,7 @@ RealMadrid ∈ EquipeMultiChampionne  (≥ 3)</pre>
 
       <div class="ind-list">
         <div class="h">Individus modélisés</div>
-        <div class="ind-row"><div class="b"></div><div><b>Real Madrid</b> — 4 trophées UCL, entraîné par Carlo Ancelotti, gardien T. Courtois, attanquant K. Mbappé</div></div>
+        <div class="ind-row"><div class="b"></div><div><b>Real Madrid</b> — 4 trophées UCL, entraîné par Carlo Ancelotti, gardien T. Courtois, attaquant K. Mbappé</div></div>
         <div class="ind-row"><div class="b"></div><div><b>Paris Saint-Germain</b> — joue au Parc des Princes, donc inféré ClubFrancais</div></div>
         <div class="ind-row"><div class="b"></div><div><b>Bayern Munich, Manchester City</b> — clubs européens</div></div>
         <div class="ind-row"><div class="b"></div><div><b>EA Guingamp</b> — joue au Roudourou (18 462 places, France)</div></div>
@@ -574,7 +574,7 @@ RealMadrid ∈ EquipeMultiChampionne  (≥ 3)</pre>
     <section class="slide" data-page="10">
       <h1 class="h1">7. Exemple de requêtes SPARQL</h1>
 
-      <div class="sparql-q">«&nbsp;Quels matchs ont été joués au Santiago Bernabeu, et quel était l'arbitre&nbsp;?&nbsp;»</div>
+      <div class="sparql-q">«&nbsp;Quels matchs ont été joués au Santiago Bernabeu et quel était l'arbitre&nbsp;?&nbsp;»</div>
 
       <div class="sparql-row">
         <div class="codebox"><span class="lab">Requête</span>
@@ -693,49 +693,19 @@ SELECT DISTINCT ?joueur ?match WHERE {
 
     <!-- ============ Slide 14 — Difficultés ============ -->
     <section class="slide" data-page="14">
-      <h1 class="h1">8. Difficultés rencontrées</h1>
+      <h1 class="h1">8. Bilan - Difficultés rencontrées</h1>
 
       <div class="diff-grid">
         <div class="diff">
-          <h3>Hypothèse du monde ouvert</h3>
-          <p>Il faut combiner ∀…only avec ∃…some pour contraindre la fermeture, et ne pas confondre absence de fait avec négation.</p>
+          <h3>Périmètre de l'ontologie</h3>
+          <p>Nous avons eu quelques difficultés à délimiter le sujet, savoir où s'arrêter…</p>
         </div>
         <div class="diff">
-          <h3>Différence entre ⊑ et ≡</h3>
-          <p>Choisir le bon constructeur est crucial : ≡ permet la classification automatique des instances, ⊑ ne fait que contraindre. Tous les concepts définis ont volontairement été passés en ≡.</p>
-        </div>
-        <div class="diff">
-          <h3>Caractéristiques contradictoires</h3>
-          <p>Premier essai : <code>joueDans</code> à la fois fonctionnelle ET inverse fonctionnelle. Cela aurait imposé qu'un joueur et un club soient en bijection : corrigé en gardant uniquement la fonctionnalité côté joueur.</p>
-        </div>
-        <div class="diff">
-          <h3>Déclarations AllDifferent</h3>
-          <p>Sans elles, le raisonneur tolère la fusion de deux individus (sameAs implicite). Toutes les villes / clubs / stades ont été déclarés deux à deux différents.</p>
-        </div>
-        <div class="diff center">
-          <h3>Transitivité utile mais coûteuse</h3>
-          <p><code>estDans</code> est transitive et regroupe <code>estLocaliseDans</code> + <code>aPourPays</code>. Permet de répondre à «&nbsp;clubs français&nbsp;» sans réécrire la chaîne, mais alourdit le raisonnement sur les grands jeux d'instances.</p>
+          <h3>Version récente de Protégé pour le SPARQL</h3>
+          <p>Nous avons commencé à faire des requêtes SPARQL avec une version "trop" récente sauf qu'elles ne fonctionnaient pas.</p>
         </div>
       </div>
       <div class="band-foot"><span>Soutenance projet ontologie • UE Connaissance et Représentation</span><span class="pg">11 / 12</span></div>
-    </section>
-
-    <!-- ============ Slide 15 — Bilan ============ -->
-    <section class="slide closing" data-page="15">
-      <div class="halo"></div>
-      <div class="body">
-        <div class="lab">Conclusion</div>
-        <h1>Une ontologie LDC complète, cohérente, interrogeable</h1>
-        <ul>
-          <li>27 concepts primitifs et 23 concepts définis</li>
-          <li>Tous les quantificateurs (∃, ∀) et restrictions de cardinalité (≥, ≤, =) couverts</li>
-          <li>21 relations dont 9 fonctionnelles, 2 transitives, 2 symétriques</li>
-          <li>Cohérence vérifiée, classifications automatiques observées</li>
-          <li>4 requêtes SPARQL fonctionnelles</li>
-        </ul>
-      </div>
-      <div class="qa">Merci de votre attention !</div>
-      <div class="meta">Soutenance projet ontologie • 12 mai 2026 • E. Kerguillec - P. Mesples</div>
     </section>
 
   </div>
@@ -771,8 +741,8 @@ SELECT DISTINCT ?joueur ?match WHERE {
     { label: "Concepts définis", slides: [6, 7] },
     { label: "Raisonneur",       slides: [8] },
     { label: "Instances",        slides: [9] },
-    { label: "SPARQL",           slides: [10] },
-    { label: "Bilan",            slides: [11, 12] }
+    { label: "SPARQL",           slides: [10, 11, 12, 13] },
+    { label: "Bilan",            slides: [14] }
   ];
 
   slides.forEach((slide, i) => {
